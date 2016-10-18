@@ -1,4 +1,4 @@
-/* Author: Shun Yap */
+/* Author: Shun Yao: shunyaorad@gmail.com */
 
 #include <ESP8266WiFi.h>
 #include <Servo.h>
