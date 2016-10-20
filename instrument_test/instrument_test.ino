@@ -12,9 +12,9 @@ const int buttonPin = 12; //Physical pin is 6
 int buttonState = 0;
 
 /* Servo parameters */
-int cupA_pos = 40;    // Position of cup A
-int cupB_pos = 60;    // Position of cup B
-int rest_pos = 0;     // Rest position not hit the cup
+#define cupA_pos 90    // Position of cup A
+#define cupB_pos 0    // Position of cup B
+#define rest_pos 45     // Rest position not hit the cup
 int servo1_pin = 2;   // Physical Pin is 4
 int servo2_pin = 0;   // Physical Pin is 3
 int rest_time = 200;  // miliseconds to wait for servo to move
@@ -41,10 +41,11 @@ void setup() {
   //Start communication between the ESP8266-12E and the monitor window
   Serial.begin(115200);
   // Obtain the IP of the Server 
-  IPAddress HTTPS_ServerIP= WiFi.softAPIP(); 
+  // IPAddress HTTPS_ServerIP= WiFi.softAPIP(); 
+  IPAddress host(192, 168, 0, 177);
   // Print the IP to the monitor window 
   Serial.print("Server IP is: "); 
-  Serial.println(HTTPS_ServerIP);
+  //Serial.println(HTTPS_ServerIP);
 
   /* Servo initialization */
   // attaches the servo
@@ -68,14 +69,14 @@ void hit(Servo servo, int t, int pos) {
 
 /* Servo is controlled by how fast 
  * you rotate potentioeter */
-void readPot(Servo servo) {
+/*void readPot(Servo servo) {
     // Loop so that it doesn't terminate itself
     while (true) {
       buttonState = digitalRead(buttonPin);
       potVal = analogRead(A0);
       potDiff = (potVal - potPrev);
       // scale it to use it with the servo (0 to 65)
-      int input = map(potDiff, -500, 500, 0, 65);
+      int input = map(potDiff, -500, 500, rest_pos, cupB_pos);
       potPrev = potVal;     
       servo.write(input);
       delay(15);
@@ -85,7 +86,38 @@ void readPot(Servo servo) {
         break;
       }
   }
+} */
+
+void readPot(Servo servo) {
+  servo.write(rest_pos);
+    // Loop so that it doesn't terminate itself
+    while (true) {
+      buttonState = digitalRead(buttonPin); 
+      int val = analogRead(A0);            // reads the value of the potentiometer (value between 0 and 1023) 
+      val = map(val, 0, 1023, cupB_pos, cupA_pos);     // scale it to use it with the servo (value between 0 and 180) 
+      servo.write(val);                  // sets the servo position according to the scaled value 
+      delay(15);
+      if (buttonState == 1) {
+        break;
+      }
+  }
 }
+
+/*
+void ButtonControl(Servo servo, int cup_pos) {
+  servo.write(rest_pos);
+  int oldVal = analogRead(A0);
+  while(true) {
+    buttonState = digitalRead(buttonPin);
+    if (buttonState == 1) {
+      hit(servo, rest_time, cup_pos);
+    }
+    if (analogRead(A0) - oldVal > 10) {
+      break;
+    }
+  }
+}
+*/
 
 void loop() {
   WiFiClient client = server.available();
@@ -112,7 +144,7 @@ void loop() {
   s += "<br><br><br>";
   s += "<a href=\"Servo2_Cup_A\">Servo2_Cup_A</a>";
   s += "<br><br><br>";
-  s += "<a href=\"Servo2_Cup_A\">Servo2_Cup_B</a>";
+  s += "<a href=\"Servo2_Cup_B\">Servo2_Cup_B</a>";
   s += "<br><br><br>";
   s += "</html>\n";
   s += "<a href=\"Potentiometer_Control1\">Potentiometer_Control1</a>";
@@ -121,7 +153,19 @@ void loop() {
   s += "</html>\n";
   s += "<a href=\"Potentiometer_Control2\">Potentiometer_Control2</a>";
   s += "</html>\n";
-
+  s += "<a href=\"Button_Control1_A\">Button_Control1_A</a>";
+  s += "<br><br><br>";
+  s += "</html>\n";
+  s += "<a href=\"Button_Control1_B\">Button_Control1_B</a>";
+  s += "<br><br><br>";
+  s += "</html>\n";
+  s += "<a href=\"Button_Control2_A\">Button_Control2_A</a>";
+  s += "<br><br><br>";
+  s += "</html>\n";
+  s += "<a href=\"Button_Control2_B\">Button_Control2_B</a>";
+  s += "<br><br><br>";
+  s += "</html>\n";
+  
   //Serve the HTML document to the browser.
   client.flush(); //clear previous info in the stream
   client.print(s); // Send the response to the client
@@ -146,5 +190,19 @@ void loop() {
 
   else if (request.indexOf("/Potentiometer_Control2") != -1){ 
   readPot(myservo2);}
+/*
+  // Button Control
+  else if (request.indexOf("/Button_Control1_A") != -1){ 
+  ButtonControl(myservo1, cupA_pos);}
+  
+  else if (request.indexOf("/Button_Control1_B") != -1){ 
+  ButtonControl(myservo1, cupB_pos);}
+
+  else if (request.indexOf("/Button_Control2_A") != -1){ 
+  ButtonControl(myservo2, cupA_pos);}
+
+  else if (request.indexOf("/Button_Control2_B") != -1){ 
+  ButtonControl(myservo2, cupB_pos);}
+*/
 }
 

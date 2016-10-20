@@ -1,10 +1,10 @@
 #include <Servo.h>
 
 // setup servo
-#define SERVORIGHT   50
-#define SERVOCENTRE 100
-#define SERVOLEFT   150
-#define SERVOPIN     5      // GPIO 5
+#define SERVOCENTER 45  // 50 is the rest position
+#define SERVORIGHT  90
+#define SERVOLEFT   0
+#define SERVOPIN     2      // GPIO 5
 
 Servo servo;
 
@@ -17,16 +17,16 @@ void setup() {
 }
 
 void loop() {
-    Serial.println("test");
-    servo.write(SERVOLEFT);
-    delay(300);
+    servo.write(SERVOCENTER);
+    Serial.println("center");
+    delay(4000);
 
     servo.write(SERVORIGHT);
-    delay(600);
-
-    servo.write(SERVOCENTRE);
-    delay(300);
-
-    delay(2000); // 2 sec
+    Serial.println("right");
+    delay(4000);
+    
+    servo.write(SERVOLEFT);
+    Serial.println("left");
+    delay(4000);
 }
 

@@ -7,9 +7,9 @@
  http://www.arduino.cc/en/Tutorial/Sweep
 */ 
 
-int cupA_pos = 40;
-int cupB_pos = 60;
-int rest_pos = 0; 
+int cupA_pos = 100;
+int cupB_pos = 30;
+int rest_pos = 60; 
 int servo1_pin = 2;
 int servo2_pin = 0;
 int rest_time = 200;
