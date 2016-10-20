@@ -33,7 +33,7 @@ void setup() {
   //Our ESP8266-12E is an AccessPoint
   WiFi.mode(WIFI_AP);
   // Provide the (SSID, password);
-  WiFi.softAP("Hello_IoT", "12345678");
+  WiFi.softAP("JAMBOX", "12345678");
   // Start the HTTP Server
   server.begin();
 

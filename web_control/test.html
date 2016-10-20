@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<title>ESP8266 LED Control</title>
+	</head>
+	<body>
+
+	<!-- in the <button> tags below the ID attribute is the value sent to the arduino -->
+
+	<button id="1" class="Servo1_Cup_A">Servo1_Cup_A</button> <!-- button for pin 11 -->
+	<button id="2" class="Servo1_Cup_B">Servo1_Cup_B</button> <!-- button for pin 12 -->
+	<button id="3" class="Servo2_Cup_A">Servo2_Cup_A</button>
+	<button id="4" class="Servo2_Cup_B">Servo2_Cup_B</button>
+	<button id="5" class="p1">Potentiometer1</button>
+	<button id="6" class="p2">Potentiometer2</button>
+
+	<script src="jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".Servo1_Cup_A").click(function(){
+				$.get("http://192.168.4.1/Servo1_Cup_A");
+			});
+			$(".Servo1_Cup_B").click(function(){
+				$.get("http://192.168.4.1/Servo1_Cup_B");
+			});
+			$(".Servo2_Cup_A").click(function(){
+				$.get("http://192.168.4.1/Servo1_Cup_A");
+			});
+			$(".Servo2_Cup_B").click(function(){
+				$.get("http://192.168.4.1/Servo2_Cup_B");
+			});
+			$(".p1").click(function(){
+				$.get("http://192.168.4.1//Potentiometer_Control1");
+			});
+			$(".p2").click(function(){
+				$.get("http://192.168.4.1//Potentiometer_Control2");
+			});
+		});
+	</script>
+	</body>
+</html>
