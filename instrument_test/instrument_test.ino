@@ -3,8 +3,8 @@
 #include <ESP8266WiFi.h>
 #include <Servo.h>
 
-// create servo object to control a servo 
-Servo myservo1; 
+// create servo object to control a servo
+Servo myservo1;
 Servo myservo2;
 
 /* Push button */
@@ -12,9 +12,9 @@ const int buttonPin = 12; //Physical pin is 6
 int buttonState = 0;
 
 /* Servo parameters */
-int cupA_pos = 40;    // Position of cup A
-int cupB_pos = 60;    // Position of cup B
-int rest_pos = 0;     // Rest position not hit the cup
+#define cupA_pos 90    // Position of cup A
+#define cupB_pos 0    // Position of cup B
+#define rest_pos 45     // Rest position not hit the cup
 int servo1_pin = 2;   // Physical Pin is 4
 int servo2_pin = 0;   // Physical Pin is 3
 int rest_time = 200;  // miliseconds to wait for servo to move
@@ -28,22 +28,22 @@ int potVal = 0;
 void setup() {
   pinMode(buttonPin, INPUT);
   // Potentiometer pin */
-  pinMode(A0, INPUT); 
+  pinMode(A0, INPUT);
   /* Wifi setup */
-  //Our ESP8266-12E is an AccessPoint 
+  //Our ESP8266-12E is an AccessPoint
   WiFi.mode(WIFI_AP);
   // Provide the (SSID, password);
   WiFi.softAP("Hello_IoT", "12345678");
   // Start the HTTP Server
-  server.begin(); 
-  
+  server.begin();
+
   //Looking under the hood
   //Start communication between the ESP8266-12E and the monitor window
   Serial.begin(115200);
-  // Obtain the IP of the Server 
-  IPAddress HTTPS_ServerIP= WiFi.softAPIP(); 
-  // Print the IP to the monitor window 
-  Serial.print("Server IP is: "); 
+  // Obtain the IP of the Server
+  IPAddress HTTPS_ServerIP= WiFi.softAPIP();
+  // Print the IP to the monitor window
+  Serial.print("Server IP is: ");
   Serial.println(HTTPS_ServerIP);
 
   /* Servo initialization */
@@ -58,29 +58,25 @@ void setup() {
 void hit(Servo servo, int t, int pos) {
   // the cup position
   servo.write(pos);
-  // wait for servo to move  
+  // wait for servo to move
   delay(t);
   // Go back to rest position
   servo.write(rest_pos);
-  // wait for servo to move  
+  // wait for servo to move
   delay(t);
 }
 
-/* Servo is controlled by how fast 
- * you rotate potentioeter */
+/* Servo is controlled rotating potentioeter */
+
 void readPot(Servo servo) {
+  servo.write(rest_pos);
     // Loop so that it doesn't terminate itself
     while (true) {
       buttonState = digitalRead(buttonPin);
-      potVal = analogRead(A0);
-      potDiff = (potVal - potPrev);
-      // scale it to use it with the servo (0 to 65)
-      int input = map(potDiff, -500, 500, 0, 65);
-      potPrev = potVal;     
-      servo.write(input);
+      int val = analogRead(A0);
+      val = map(val, 0, 1023, cupB_pos, cupA_pos);
+      servo.write(val);
       delay(15);
-      Serial.println(buttonState);
-      // Push button to terminate
       if (buttonState == 1) {
         break;
       }
@@ -89,17 +85,17 @@ void readPot(Servo servo) {
 
 void loop() {
   WiFiClient client = server.available();
-  if (!client) { 
-    return; 
-  } 
-  
-  //Looking under the hood 
+  if (!client) {
+    return;
+  }
+
+  //Looking under the hood
   Serial.println("Somebody has connected :)");
-  
+
   //Read what the browser has sent into a String class and print the request to the monitor
   String request = client.readStringUntil('\r');
-  
-  //Looking under the hood 
+
+  //Looking under the hood
   Serial.println(request);
 
   // Prepare the HTML document to respond:
@@ -112,7 +108,7 @@ void loop() {
   s += "<br><br><br>";
   s += "<a href=\"Servo2_Cup_A\">Servo2_Cup_A</a>";
   s += "<br><br><br>";
-  s += "<a href=\"Servo2_Cup_A\">Servo2_Cup_B</a>";
+  s += "<a href=\"Servo2_Cup_B\">Servo2_Cup_B</a>";
   s += "<br><br><br>";
   s += "</html>\n";
   s += "<a href=\"Potentiometer_Control1\">Potentiometer_Control1</a>";
@@ -129,22 +125,22 @@ void loop() {
   Serial.println("Client disonnected"); //Looking under the hood
 
   // Handle the Request
-  if (request.indexOf("/Servo1_Cup_A") != -1){ 
+  if (request.indexOf("/Servo1_Cup_A") != -1){
   hit(myservo1, rest_time, cupA_pos);}
-  
-  else if (request.indexOf("/Servo1_Cup_B") != -1){ 
+
+  else if (request.indexOf("/Servo1_Cup_B") != -1){
   hit(myservo1, rest_time, cupB_pos);}
-  
-  else if (request.indexOf("/Servo2_Cup_A") != -1){ 
+
+  else if (request.indexOf("/Servo2_Cup_A") != -1){
   hit(myservo2, rest_time, cupA_pos);}
 
-  else if (request.indexOf("/Servo2_Cup_B") != -1){ 
+  else if (request.indexOf("/Servo2_Cup_B") != -1){
   hit(myservo2, rest_time, cupB_pos);}
 
-  else if (request.indexOf("/Potentiometer_Control1") != -1){ 
+  else if (request.indexOf("/Potentiometer_Control1") != -1){
   readPot(myservo1);}
 
-  else if (request.indexOf("/Potentiometer_Control2") != -1){ 
+  else if (request.indexOf("/Potentiometer_Control2") != -1){
   readPot(myservo2);}
 }
 
